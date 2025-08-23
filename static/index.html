@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SF Food Truck Finder</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1><i class="fas fa-truck"></i> SF Food Truck Finder</h1>
+            <p>Discover mobile food facilities across San Francisco</p>
+            <div class="header-actions">
+                <a href="/api/docs" target="_blank" class="docs-btn">
+                    <i class="fas fa-book"></i> API Documentation
+                </a>
+            </div>
+        </header>
+
+        <!-- Search Form -->
+        <div class="search-container">
+            <div class="search-tabs">
+                <button class="tab-btn active" data-tab="name">
+                    <i class="fas fa-store"></i> Search by Name
+                </button>
+                <button class="tab-btn" data-tab="street">
+                    <i class="fas fa-map-marker-alt"></i> Search by Street
+                </button>
+                <button class="tab-btn" data-tab="proximity">
+                    <i class="fas fa-location-arrow"></i> Search by Location
+                </button>
+            </div>
+
+            <!-- Name Search Form -->
+            <form id="nameSearchForm" class="search-form active">
+                <div class="form-group">
+                    <label for="applicantName">Business Name</label>
+                    <input type="text" id="applicantName" placeholder="e.g., Philz Coffee, Tacos El Nene" required>
+                </div>
+                <div class="form-group">
+                    <label for="nameStatus">Status Filter (Optional)</label>
+                    <select id="nameStatus">
+                        <option value="">All Statuses</option>
+                        <option value="APPROVED">Approved</option>
+                        <option value="REQUESTED">Requested</option>
+                        <option value="EXPIRED">Expired</option>
+                    </select>
+                </div>
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </form>
+
+            <!-- Street Search Form -->
+            <form id="streetSearchForm" class="search-form">
+                <div class="form-group">
+                    <label for="streetName">Street Name</label>
+                    <input type="text" id="streetName" placeholder="e.g., SANSOME, MISSION, MARKET" required>
+                </div>
+                <div class="form-group">
+                    <label for="streetStatus">Status Filter (Optional)</label>
+                    <select id="streetStatus">
+                        <option value="">All Statuses</option>
+                        <option value="APPROVED">Approved</option>
+                        <option value="REQUESTED">Requested</option>
+                        <option value="EXPIRED">Expired</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="streetLimit">Max Results</label>
+                    <input type="number" id="streetLimit" min="1" max="100" value="10">
+                </div>
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </form>
+
+            <!-- Proximity Search Form -->
+            <form id="proximitySearchForm" class="search-form">
+                <div class="form-group">
+                    <label for="latitude">Latitude</label>
+                    <input type="number" id="latitude" step="any" placeholder="e.g., 37.7749" required>
+                </div>
+                <div class="form-group">
+                    <label for="longitude">Longitude</label>
+                    <input type="number" id="longitude" step="any" placeholder="e.g., -122.4194" required>
+                </div>
+                <div class="form-group">
+                    <label for="proximityStatus">Status Filter (Optional)</label>
+                    <select id="proximityStatus">
+                        <option value="">All Statuses</option>
+                        <option value="APPROVED">Approved</option>
+                        <option value="REQUESTED">Requested</option>
+                        <option value="EXPIRED">Expired</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="proximityLimit">Max Results</label>
+                    <input type="number" id="proximityLimit" min="1" max="100" value="5">
+                </div>
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </form>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-container" id="resultsContainer" style="display: none;">
+            <div class="results-header">
+                <h2>Search Results</h2>
+                <div class="results-info" id="resultsInfo"></div>
+            </div>
+            <div class="results-grid" id="resultsGrid"></div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Searching for food trucks...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message" id="errorMessage" style="display: none;"></div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button class="action-btn" onclick="getCurrentLocation()">
+                <i class="fas fa-crosshairs"></i> Use My Location
+            </button>
+            <button class="action-btn" onclick="showRandomLocation()">
+                <i class="fas fa-dice"></i> Random SF Location
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
