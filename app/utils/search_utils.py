@@ -15,8 +15,8 @@ def apply_status_filter(df: pd.DataFrame, status: StatusType = None) -> pd.DataF
         Filtered DataFrame
     """
     if status:
-        return df[df['status'] == status.value]
-    return df
+        return df[df['Status'] == status.value].copy()
+    return df.copy()
 
 def search_by_name(df: pd.DataFrame, applicant: str, status: StatusType = None) -> pd.DataFrame:
     """
@@ -36,7 +36,7 @@ def search_by_name(df: pd.DataFrame, applicant: str, status: StatusType = None) 
     # Apply status filter
     df = apply_status_filter(df, status)
     
-    mask = df['applicant'].str.contains(applicant, case=False, na=False)
+    mask = df['Applicant'].str.contains(applicant, case=False, na=False)
     return df[mask]
 
 def search_by_street(df: pd.DataFrame, street: str, status: StatusType = None) -> pd.DataFrame:
@@ -57,7 +57,7 @@ def search_by_street(df: pd.DataFrame, street: str, status: StatusType = None) -
     # Apply status filter
     df = apply_status_filter(df, status)
     
-    mask = df['address'].str.contains(street, case=False, na=False)
+    mask = df['Address'].str.contains(street, case=False, na=False)
     return df[mask]
 
 def search_by_proximity(df: pd.DataFrame, latitude: float, longitude: float, status: StatusType = StatusType.APPROVED) -> pd.DataFrame:
@@ -81,17 +81,17 @@ def search_by_proximity(df: pd.DataFrame, latitude: float, longitude: float, sta
     
     # Copy the DataFrame first, then filter to only rows with valid coordinates
     df_copy = df.copy()
-    valid_coords_df = df_copy.dropna(subset=['latitude', 'longitude'])
+    valid_coords_df = df_copy.dropna(subset=['Latitude', 'Longitude'])
     
     if valid_coords_df.empty:
         return valid_coords_df  # Return empty DataFrame if no valid coordinates
     
     # Calculate distances and sort by proximity
-    valid_coords_df['distance'] = valid_coords_df.apply(
+    valid_coords_df['Distance'] = valid_coords_df.apply(
         lambda row: haversine_distance(
             latitude, longitude,
-            row['latitude'], row['longitude']
+            row['Latitude'], row['Longitude']
         ), axis=1
     )
-    return valid_coords_df.sort_values('distance')
+    return valid_coords_df.sort_values('Distance')
 

@@ -12,21 +12,15 @@ def convert_to_food_trucks(df: pd.DataFrame) -> List[FoodTruck]:
     Returns:
         List of FoodTruck objects
     """
-    food_trucks = []
-    for _, row in df.iterrows():
-        food_truck = FoodTruck(
-            locationid=str(row['locationid']),
-            applicant=str(row['applicant']),
-            facility_type=str(row['facilitytype']),
-            address=str(row['address']),
-            status=str(row['status']),
-            food_items=str(row['fooditems']),
-            latitude=float(row['latitude']),
-            longitude=float(row['longitude']),
-            location_description=row.get('locationdescription')
-        )
-        food_trucks.append(food_truck)
+    # Replace NaN values with None for proper JSON serialization
+    df_clean = df.replace({float('nan'): None})
     
+    # Convert to list of dictionaries and create FoodTruck objects
+    data_dicts = df_clean.to_dict('records')
+    food_trucks = [FoodTruck(**data_dict) for data_dict in data_dicts]
+    
+    # Convert to JSON and back to ensure proper field names are used
+    # This ensures the Pydantic model field names (not aliases) are used in the response
     return food_trucks
 
 def create_search_metadata(query_type: SearchType, status: StatusType = None, limit: int = 10, 

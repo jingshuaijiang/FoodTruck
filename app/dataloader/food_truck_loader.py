@@ -20,25 +20,6 @@ class FoodTruckDataLoader:
                 
                 self._data = pd.read_csv(csv_path)
                 
-                # Clean up column names and handle missing values
-                self._data.columns = self._data.columns.str.lower()
-                self._data['latitude'] = pd.to_numeric(self._data['latitude'], errors='coerce')
-                self._data['longitude'] = pd.to_numeric(self._data['longitude'], errors='coerce')
-                
-                # Filter out invalid coordinate values (inf, -inf, NaN)
-                self._data = self._data[
-                    (self._data['latitude'].notna()) & 
-                    (self._data['longitude'].notna()) &
-                    (self._data['latitude'] != float('inf')) & 
-                    (self._data['longitude'] != float('inf')) &
-                    (self._data['latitude'] != float('-inf')) & 
-                    (self._data['longitude'] != float('-inf')) &
-                    (self._data['latitude'] != 0.0) &  # Filter out 0,0 coordinates
-                    (self._data['longitude'] != 0.0)
-                ]
-                
-                print(f"Data loaded successfully. {len(self._data)} records loaded after coordinate filtering.")
-                
                 self._data_loaded = True
                 print(f"Data loaded successfully. {len(self._data)} records loaded.")
                 

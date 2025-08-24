@@ -1,6 +1,4 @@
 // DOM Elements
-const tabBtns = document.querySelectorAll('.tab-btn');
-const searchForms = document.querySelectorAll('.search-form');
 const resultsContainer = document.getElementById('resultsContainer');
 const resultsGrid = document.getElementById('resultsGrid');
 const resultsInfo = document.getElementById('resultsInfo');
@@ -9,28 +7,6 @@ const errorMessage = document.getElementById('errorMessage');
 
 // API Base URL
 const API_BASE_URL = 'http://localhost:8000/api';
-
-// Tab Switching
-tabBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        const targetTab = btn.dataset.tab;
-        
-        // Update active tab button
-        tabBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        // Show corresponding form
-        searchForms.forEach(form => {
-            form.classList.remove('active');
-            if (form.id === `${targetTab}SearchForm`) {
-                form.classList.add('active');
-            }
-        });
-        
-        // Clear previous results
-        clearResults();
-    });
-});
 
 // Form Submissions
 document.getElementById('nameSearchForm').addEventListener('submit', (e) => {
@@ -49,13 +25,11 @@ document.getElementById('streetSearchForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const street = document.getElementById('streetName').value;
     const status = document.getElementById('streetStatus').value;
-    const limit = document.getElementById('streetLimit').value;
     
     searchFoodTrucks({
         query_type: 'street',
         street: street,
-        status: status || undefined,
-        limit: parseInt(limit)
+        status: status || undefined
     });
 });
 
@@ -64,14 +38,12 @@ document.getElementById('proximitySearchForm').addEventListener('submit', (e) =>
     const latitude = parseFloat(document.getElementById('latitude').value);
     const longitude = parseFloat(document.getElementById('longitude').value);
     const status = document.getElementById('proximityStatus').value;
-    const limit = document.getElementById('proximityLimit').value;
     
     searchFoodTrucks({
         query_type: 'proximity',
         latitude: latitude,
         longitude: longitude,
-        status: status || undefined,
-        limit: parseInt(limit)
+        status: status || undefined
     });
 });
 
@@ -93,7 +65,7 @@ async function searchFoodTrucks(searchParams) {
         const data = await response.json();
         
         if (!response.ok) {
-            throw new Error(data.error || 'Search failed');
+            throw new Error(data.detail || 'Search failed');
         }
         
         if (data.success) {
@@ -111,6 +83,10 @@ async function searchFoodTrucks(searchParams) {
 
 // Display Results
 function displayResults(data) {
+    console.log('Displaying results with data:', data);
+    console.log('Data.data:', data.data);
+    console.log('First truck:', data.data[0]);
+    
     resultsInfo.innerHTML = `
         <span>Found ${data.metadata.total_results} results</span>
         <span>•</span>
@@ -129,26 +105,38 @@ function displayResults(data) {
 
 // Create Truck Card
 function createTruckCard(truck) {
-    const statusClass = truck.status.toLowerCase();
+    console.log('Creating card for truck:', truck);
+    console.log('Truck Status:', truck.Status);
+    console.log('Truck Status type:', typeof truck.Status);
+    
+    // Extra safety check for Status field
+    let statusClass = 'unknown';
+    if (truck && truck.Status && typeof truck.Status === 'string') {
+        statusClass = truck.Status.toLowerCase();
+    }
+    
+    console.log('Status class:', statusClass);
+    
     return `
         <div class="food-truck-card">
-            <h3>${escapeHtml(truck.applicant)}</h3>
+            <h3>${escapeHtml(truck.Applicant || 'N/A')}</h3>
             <div class="food-truck-info">
-                <strong>Type:</strong> ${escapeHtml(truck.facility_type)}
+                <strong>Type:</strong> ${escapeHtml(truck.FacilityType || 'N/A')}
             </div>
             <div class="food-truck-info">
-                <strong>Address:</strong> ${escapeHtml(truck.address)}
+                <strong>Address:</strong> ${escapeHtml(truck.Address || 'N/A')}
             </div>
             <div class="food-truck-info">
-                <strong>Status:</strong> <span class="status ${statusClass}">${truck.status}</span>
+                <strong>Status:</strong> <span class="status ${statusClass}">${truck.Status || 'N/A'}</span>
             </div>
             <div class="food-truck-info">
-                <strong>Food Items:</strong> ${escapeHtml(truck.food_items)}
+                <strong>Food Items:</strong> ${escapeHtml(truck.FoodItems || 'N/A')}
             </div>
             <div class="food-truck-info">
-                <strong>Location:</strong> ${truck.latitude.toFixed(6)}, ${truck.longitude.toFixed(6)}
+                <strong>Location:</strong> ${truck.Latitude && truck.Longitude ? `${truck.Latitude.toFixed(6)}, ${truck.Longitude.toFixed(6)}` : 'N/A'}
             </div>
-            ${truck.location_description ? `<div class="food-truck-info"><strong>Description:</strong> ${escapeHtml(truck.location_description)}</div>` : ''}
+            ${truck.LocationDescription ? `<div class="food-truck-info"><strong>Description:</strong> ${escapeHtml(truck.LocationDescription)}</div>` : ''}
+            ${truck.Schedule ? `<div class="food-truck-info"><strong>Schedule:</strong> <a href="${truck.Schedule}" target="_blank">View Schedule</a></div>` : ''}
         </div>
     `;
 }
@@ -178,21 +166,19 @@ function clearResults() {
 }
 
 function escapeHtml(text) {
+    if (text === null || text === undefined) return 'N/A';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
 
-// Quick Actions
+// Location Functions
 function getCurrentLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 document.getElementById('latitude').value = position.coords.latitude.toFixed(6);
                 document.getElementById('longitude').value = position.coords.longitude.toFixed(6);
-                
-                // Switch to proximity tab
-                document.querySelector('[data-tab="proximity"]').click();
             },
             (error) => {
                 showError('Unable to get your location: ' + error.message);
@@ -204,7 +190,6 @@ function getCurrentLocation() {
 }
 
 function showRandomLocation() {
-    // Random SF coordinates
     const sfLocations = [
         { lat: 37.7749, lng: -122.4194, name: 'Downtown SF' },
         { lat: 37.7849, lng: -122.4094, name: 'Financial District' },
@@ -217,9 +202,6 @@ function showRandomLocation() {
     
     document.getElementById('latitude').value = randomLocation.lat;
     document.getElementById('longitude').value = randomLocation.lng;
-    
-    // Switch to proximity tab
-    document.querySelector('[data-tab="proximity"]').click();
     
     // Show notification
     const notification = document.createElement('div');
@@ -255,9 +237,7 @@ document.head.appendChild(style);
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    // Set default tab
-    document.querySelector('[data-tab="name"]').click();
-    
-    // Add some sample data for demonstration
     console.log('SF Food Truck Finder loaded successfully!');
 });
+
+
