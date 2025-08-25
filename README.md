@@ -149,6 +149,15 @@ The project includes comprehensive unit tests for all components:
 #### Framework Selection
 - **FastAPI**: Selected over Flask for its built-in automatic API documentation generation, enhancing developer experience and API discoverability 
 
+#### Implementation Workflow
+
+**Text-Based Search (Name/Street):**
+- Utilizes pandas DataFrame `contains()` function for efficient substring matching
+- Performs case-insensitive searches across applicant names and street addresses
+
+**Geographic Search (Coordinates):**
+- Calculates Haversine distance between query coordinates and all food truck locations
+- Sorts results by proximity and applies distance-based filtering
 
 ## Critique section:
 ### 1. What would you have done differently if you had spent more time on this?
