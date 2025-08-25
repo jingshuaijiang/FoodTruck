@@ -95,25 +95,25 @@ The project includes comprehensive unit tests for all components:
    
    **(Recommended):**
    ```bash
-   pip install -r requirements.txt
+   docker exec food-truck-api python -m pytest tests/ -v
    ```
 
 2. **Run all tests:**
    ```bash
-   python run_tests.py
+   docker exec food-truck-api python run_tests.py
    # or
-   python -m pytest tests/ -v
+   docker exec food-truck-api python -m pytest tests/ -v
    ```
 
 3. **Run specific test files:**
    ```bash
-   python run_tests.py tests/test_models.py
-   python run_tests.py tests/test_api.py
+   docker exec food-truck-api python run_tests.py tests/test_models.py
+   docker exec food-truck-api python run_tests.py tests/test_api.py
    ```
 
 4. **Run specific test functions:**
    ```bash
-   python -m pytest tests/test_models.py::TestSearchRequest::test_valid_name_search -v
+   docker exec food-truck-api python -m pytest tests/test_models.py::TestSearchRequest::test_valid_name_search -v
    ```
 
 
@@ -144,6 +144,7 @@ The project includes comprehensive unit tests for all components:
 #### Data Processing Strategy
 - **In-Memory Processing**: Chosen for optimal performance with the provided dataset size, eliminating I/O bottlenecks
 - **Pandas Integration**: Leveraged for efficient data manipulation and analysis capabilities
+- **Data Refreshing**: In memory data refreshed every 1 min
 
 #### Framework Selection
 - **FastAPI**: Selected over Flask for its built-in automatic API documentation generation, enhancing developer experience and API discoverability 
